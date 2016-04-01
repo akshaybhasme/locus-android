@@ -1,7 +1,6 @@
 package com.radiuslabs.locus;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,7 +9,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.radiuslabs.locus.adapters.NewsFeedAdapter;
 
@@ -29,10 +27,6 @@ public class NewsFeedActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
-        if(getSupportActionBar() != null){
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
 
         // use this setting to improve performance if you know that changes
@@ -46,15 +40,7 @@ public class NewsFeedActivity extends AppCompatActivity {
         // specify an adapter (see also next example)
         String[] myDataset = {"Akshay", "Akshay", "Akshay", "Akshay", "Akshay", "Akshay", "Akshay"};
         mAdapter = new NewsFeedAdapter(myDataset);
-//        mRecyclerView.setAdapter(mAdapter);
-
-        findViewById(R.id.fabCaptureStory).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(NewsFeedActivity.this, StoryCaptureActivity.class);
-                startActivity(intent);
-            }
-        });
+        mRecyclerView.setAdapter(mAdapter);
 
     }
 
@@ -76,6 +62,11 @@ public class NewsFeedActivity extends AppCompatActivity {
             case R.id.action_search:
                 Intent searchIntent = new Intent(NewsFeedActivity.this, SearchContentActivity.class);
                 startActivity(searchIntent);
+                return true;
+
+            case R.id.action_post:
+                Intent postIntent = new Intent(NewsFeedActivity.this, StoryCaptureActivity.class);
+                startActivity(postIntent);
                 return true;
         }
         return super.onOptionsItemSelected(item);

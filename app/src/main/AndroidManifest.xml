@@ -37,7 +37,8 @@
         <activity android:name=".SearchContentActivity" />
         <activity
             android:name=".UserInterestsActivity"
-            android:label="@string/title_activity_user_interests"></activity>
+            android:label="@string/title_activity_user_interests"
+            android:theme="@style/AppThemeForToolbar" />
     </application>
 
 </manifest>
