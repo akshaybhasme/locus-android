@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.radiuslabs.locus">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:logo="@drawable/banner"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".LauncherActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".LoginActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <activity
+            android:name=".RegisterActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <activity
+            android:name=".NewsFeedActivity"
+            android:icon="@drawable/banner"
+            android:theme="@style/AppThemeForToolbar" />
+        <activity
+            android:name=".StoryCaptureActivity"
+            android:label="@string/title_activity_story_capture" />
+        <activity
+            android:name=".UserProfileActivity"
+            android:theme="@style/AppThemeForToolbar" />
+        <activity android:name=".SearchContentActivity" />
+        <activity
+            android:name=".UserInterestsActivity"
+            android:label="@string/title_activity_user_interests"></activity>
+    </application>
+
+</manifest>

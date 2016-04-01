@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Locus</string>
+
+    <drawable name="button_color">#3268a7</drawable>
+    <drawable name="button_pressed">#284f7e</drawable>
+    <string name="title_activity_story_capture">StoryCaptureActivity</string>
+    <string name="title_activity_user_interests">UserInterestsActivity</string>
+</resources>
