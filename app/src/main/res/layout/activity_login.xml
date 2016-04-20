@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.radiuslabs.locus.LoginActivity"
-    android:background="#21b6cc">
+    android:background="#21b6cc"
+    android:id="@+id/rootView">
 
     <LinearLayout
         android:orientation="vertical"

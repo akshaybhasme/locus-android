@@ -4,20 +4,20 @@ import java.util.List;
 
 public class User {
 
-    private String email_id;
+    private String email;
     private String first_name;
     private String last_name;
     private String gender;
-    private String user_name;
+    private String username;
     private String password;
     private List<Interest> interests;
 
     public String getEmail_id() {
-        return email_id;
+        return email;
     }
 
     public void setEmail_id(String email_id) {
-        this.email_id = email_id;
+        this.email = email_id;
     }
 
     public String getFirst_name() {
@@ -45,11 +45,11 @@ public class User {
     }
 
     public String getUser_name() {
-        return user_name;
+        return username;
     }
 
     public void setUser_name(String user_name) {
-        this.user_name = user_name;
+        this.username = user_name;
     }
 
     public String getPassword() {

@@ -1,32 +1,43 @@
 package com.radiuslabs.locus;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.ComponentName;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.ImageView;
+
+import com.radiuslabs.locus.models.Story;
+import com.radiuslabs.locus.restservices.RestClient;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class StoryCaptureActivity extends Activity {
 
-    public static final int REQUEST_IMAGE_CAPTURE = 111;
-    public static final int REQUEST_GALLERY = 222;
+    public static final String TAG = "StoryCaptureActivity";
 
-    private ImageButton imageButton;
+    public static final int REQUEST_IMAGE_CAPTURE = 111;
+
+    private ImageView imageView;
     private EditText storyText;
 
     @Override
@@ -34,17 +45,12 @@ public class StoryCaptureActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_story_capture);
 
-        imageButton = (ImageButton) findViewById(R.id.ibSelectMedia);
+        imageView = (ImageView) findViewById(R.id.ibSelectMedia);
         storyText = (EditText) findViewById(R.id.etStoryText);
 
-        imageButton.setOnClickListener(new View.OnClickListener() {
+        imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-//                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-//                }
-//                selectImageSource();
                 openImageIntent();
             }
         });
@@ -52,49 +58,54 @@ public class StoryCaptureActivity extends Activity {
         findViewById(R.id.fabUploadStory).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                publishStory();
             }
         });
+
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            imageButton.setImageBitmap(imageBitmap);
-        }
-    }
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_IMAGE_CAPTURE) {
+                final boolean isCamera;
+                if (data == null) {
+                    isCamera = true;
+                } else {
+                    final String action = data.getAction();
+                    if (action == null) {
+                        isCamera = false;
+                    } else {
+                        isCamera = action.equals(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                    }
+                }
+                Uri selectedImageUri;
+                if (isCamera) {
+                    selectedImageUri = outputFileUri;
+                } else {
+                    selectedImageUri = data.getData();
+                }
+                Log.d(TAG, "Path: " + selectedImageUri.getPath());
 
-    private void selectImageSource() {
-        final CharSequence[] options = {"Camera", "Gallery"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Add Photo!");
-        builder.setItems(options, new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                if (options[item].equals("Camera")) {
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    File f = new File(android.os.Environment.getExternalStorageDirectory(), "temp.jpg");
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
-                    //pic = f;
-                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-                } else if (options[item].equals("Gallery")) {
-                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(intent, 2);
+                try {
+                    Bitmap d = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
+                    int nh = (int) (d.getHeight() * (720.0 / d.getWidth()));
+                    Bitmap scaled = Bitmap.createScaledBitmap(d, 720, nh, true);
+                    imageView.setImageBitmap(scaled);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
-        });
-        builder.show();
+        }
     }
 
     private Uri outputFileUri;
 
+    //TODO use Util function
     private void openImageIntent() {
 
         // Determine Uri of camera image to save.
-        final File root = new File(Environment.getExternalStorageDirectory() + File.separator + "MyDir" + File.separator);
+        final File root = new File(Environment.getExternalStorageDirectory() + File.separator + "Locus" + File.separator);
         root.mkdirs();
         final String fname = "ImageName";//Utils.getUniqueImageFilename();
         final File sdImageMainDirectory = new File(root, fname);
@@ -126,6 +137,33 @@ public class StoryCaptureActivity extends Activity {
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, cameraIntents.toArray(new Parcelable[cameraIntents.size()]));
 
         startActivityForResult(chooserIntent, REQUEST_IMAGE_CAPTURE);
+    }
+
+    private void publishStory() {
+        Story story = new Story();
+        story.setContent_text(storyText.getText().toString());
+        // Get the location manager
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        String bestProvider = locationManager.getBestProvider(criteria, false);
+        Location location = locationManager.getLastKnownLocation(bestProvider);
+        Log.d(TAG, location.getLatitude() + " " + location.getLongitude());
+        story.setLocation(location.getLatitude(), location.getLongitude());
+
+        Call<Story> call = RestClient.getInstance().getStoryService().createStory(story);
+        call.enqueue(new Callback<Story>() {
+            @Override
+            public void onResponse(Call<Story> call, Response<Story> response) {
+                finish();
+            }
+
+            @Override
+            public void onFailure(Call<Story> call, Throwable t) {
+                t.printStackTrace();
+                ;
+            }
+        });
+
     }
 
 }

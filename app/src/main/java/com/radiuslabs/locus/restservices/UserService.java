@@ -1,5 +1,6 @@
 package com.radiuslabs.locus.restservices;
 
+import com.radiuslabs.locus.models.AccessToken;
 import com.radiuslabs.locus.models.User;
 
 import java.util.List;
@@ -14,7 +15,10 @@ public interface UserService {
     @GET("/api/users")
     Call<List<User>> getUsers();
 
-    @POST("/api/users")
+    @POST("/api/users/register")
     Call<User> createUser(@Body User user);
+
+    @POST("/auth")
+    Call<AccessToken> login(@Body User user);
 
 }

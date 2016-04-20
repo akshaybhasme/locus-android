@@ -3,6 +3,7 @@
     package="com.radiuslabs.locus">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
@@ -42,6 +43,7 @@
             android:name=".UserInterestsActivity"
             android:label="@string/title_activity_user_interests"
             android:theme="@style/AppThemeForToolbar" />
+        <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
     </application>
 
 </manifest>
