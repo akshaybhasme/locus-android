@@ -1,6 +1,5 @@
 package com.radiuslabs.locus;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -64,10 +63,10 @@ public class UserInterestsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_profile:
-                Intent intent = new Intent(UserInterestsActivity.this, NewsFeedActivity.class);
-                startActivity(intent);
-                return true;
+//            case R.id.action_profile:
+//                Intent intent = new Intent(UserInterestsActivity.this, NewsFeedActivity.class);
+//                startActivity(intent);
+//                return true;
         }
         return super.onOptionsItemSelected(item);
     }

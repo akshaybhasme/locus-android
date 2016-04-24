@@ -4,26 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_search"
-        android:title="Search"
-        android:icon="@drawable/ic_search_white_48dp"
-        app:showAsAction="always" />
-
-    <item
-        android:id="@+id/action_profile"
-        android:title="My Profile"
-        android:icon="@drawable/ic_face_white_48dp"
-        app:showAsAction="always" />
-
-    <item
         android:id="@+id/action_post"
         android:title="Create story"
         android:icon="@drawable/ic_add_white_48dp"
         app:showAsAction="always" />
-
-    <item
-        android:id="@+id/action_logout"
-        android:title="Logout"
-        app:showAsAction="never" />
 
 </menu>
