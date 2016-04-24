@@ -84,7 +84,7 @@ public class Story {
     }
 
     public class StoryLocation {
-        private String type;
+        private String type = "Point";
 
         private List<Double> coordinates;
 

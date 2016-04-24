@@ -8,7 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.radiuslabs.locus.adapters.NewsFeedAdapter;
 import com.radiuslabs.locus.models.Story;
@@ -30,7 +29,6 @@ public class UserProfileActivity extends AppCompatActivity {
     private NewsFeedAdapter mAdapter;
     private CollapsingToolbarLayout collapsingToolbar;
     private ImageView ivProfilePic;
-    private TextView tvUserName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +46,7 @@ public class UserProfileActivity extends AppCompatActivity {
         collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
 
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
-        mRecyclerView.setHasFixedSize(true);
+//        mRecyclerView.setHasFixedSize(true);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -56,7 +54,6 @@ public class UserProfileActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mAdapter);
 
         ivProfilePic = (ImageView) findViewById(R.id.ivProfilePic);
-        tvUserName = (TextView) findViewById(R.id.tvUserName);
 
         RestClient.getInstance().getStoryService().getUserStories().enqueue(new Callback<List<Story>>() {
             @Override
@@ -99,7 +96,7 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void setUserProfile(User user) {
-        tvUserName.setText(
+        collapsingToolbar.setTitle(
                 user.getFirst_name()
                         + " "
                         + user.getLast_name()

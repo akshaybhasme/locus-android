@@ -163,7 +163,9 @@ public class StoryCaptureActivity extends Activity {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     try {
-                        Log.d(TAG, "Image file resp: " + response.body().string());
+                        String contentUrl = response.body().string();
+                        Log.d(TAG, "Image file resp: " + contentUrl);
+                        publishStory(contentUrl);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -178,7 +180,7 @@ public class StoryCaptureActivity extends Activity {
         });
     }
 
-    private void publishStory() {
+    private void publishStory(String contentUrl) {
         Story story = new Story();
         story.setContent_text(storyText.getText().toString());
         // Get the location manager
@@ -189,11 +191,15 @@ public class StoryCaptureActivity extends Activity {
         Log.d(TAG, location.getLatitude() + " " + location.getLongitude());
         story.setLocation(location.getLatitude(), location.getLongitude());
 
+        story.setContent_url(contentUrl);
+
         Call<Story> call = RestClient.getInstance().getStoryService().createStory(story);
         call.enqueue(new Callback<Story>() {
             @Override
             public void onResponse(Call<Story> call, Response<Story> response) {
-                finish();
+                if (response.isSuccessful()) {
+                    finish();
+                }
             }
 
             @Override

@@ -3,6 +3,8 @@
 
     <drawable name="button_color">#3268a7</drawable>
     <drawable name="button_pressed">#284f7e</drawable>
+    <drawable name="button_white">#fff</drawable>
+    <color name="primary">#21b6cc</color>
     <string name="title_activity_story_capture">StoryCaptureActivity</string>
     <string name="title_activity_user_interests">UserInterestsActivity</string>
     <string name="title_activity_navigation_drawer">NavigationDrawerActivity</string>
