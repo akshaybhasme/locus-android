@@ -18,6 +18,9 @@ public interface UserService {
     @POST("/api/users/register")
     Call<User> createUser(@Body User user);
 
+    @GET("/api/users/profile")
+    Call<User> getSelf();
+
     @POST("/auth")
     Call<AccessToken> login(@Body User user);
 

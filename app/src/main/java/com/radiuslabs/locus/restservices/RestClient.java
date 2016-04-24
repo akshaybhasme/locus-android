@@ -1,11 +1,7 @@
 package com.radiuslabs.locus.restservices;
 
-import android.util.Log;
-
 import java.io.IOException;
-import java.util.Set;
 
-import okhttp3.Headers;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -19,6 +15,7 @@ public class RestClient {
     public static final String TAG = "RestClient";
 
     public static final String apiUrl = "http://flask-env.vf8pkwjdey.us-west-2.elasticbeanstalk.com/";
+//    public static final String apiUrl = "http://192.168.0.24:5000/";
 
     private static RestClient instance;
 
@@ -40,12 +37,6 @@ public class RestClient {
                         Request request = chain.request();
                         if (accessToken != null) {
                             request = request.newBuilder().addHeader("Authorization", "JWT " + accessToken).build();
-                        }
-                        Log.d(TAG, "***** Headers *****");
-                        Headers headers = request.headers();
-                        Set<String> names = headers.names();
-                        for (String name : names) {
-                            Log.d(TAG, name + ": " + headers.get(name));
                         }
                         return chain.proceed(request);
                     }

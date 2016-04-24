@@ -4,11 +4,12 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
-import android.view.ViewParent;
 import android.widget.SearchView;
 
 import com.radiuslabs.locus.adapters.NewsFeedAdapter;
+import com.radiuslabs.locus.models.Story;
+
+import java.util.ArrayList;
 
 public class SearchContentActivity extends AppCompatActivity {
 
@@ -31,9 +32,7 @@ public class SearchContentActivity extends AppCompatActivity {
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        // specify an adapter (see also next example)
-        String[] myDataset = {};
-        mAdapter = new NewsFeedAdapter(myDataset);
+        mAdapter = new NewsFeedAdapter(new ArrayList<Story>());
         mRecyclerView.setAdapter(mAdapter);
 
         SearchView searchView = new SearchView(this);

@@ -7,14 +7,28 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
 import com.radiuslabs.locus.adapters.NewsFeedAdapter;
+import com.radiuslabs.locus.models.Story;
+import com.radiuslabs.locus.models.User;
+import com.radiuslabs.locus.restservices.RestClient;
+import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class UserProfileActivity extends AppCompatActivity {
 
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    public static final String TAG = "UserProfileActivity";
+
+    private NewsFeedAdapter mAdapter;
+    private CollapsingToolbarLayout collapsingToolbar;
+    private ImageView ivProfilePic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,24 +43,46 @@ public class UserProfileActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
 
-        collapsingToolbar.setTitle("Akshay Bhasme");
-
-        mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
-
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
+        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
         mRecyclerView.setHasFixedSize(true);
 
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // specify an adapter (see also next example)
-        String[] myDataset = {"Akshay", "Akshay", "Akshay", "Akshay", "Akshay", "Akshay", "Akshay"};
-        mAdapter = new NewsFeedAdapter(myDataset);
+        mAdapter = new NewsFeedAdapter(new ArrayList<Story>());
         mRecyclerView.setAdapter(mAdapter);
+
+        ivProfilePic = (ImageView) findViewById(R.id.ivProfilePic);
+
+        RestClient.getInstance().getStoryService().getUserStories().enqueue(new Callback<List<Story>>() {
+            @Override
+            public void onResponse(Call<List<Story>> call, Response<List<Story>> response) {
+                if (response.isSuccessful()) {
+                    mAdapter.setStories(response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Story>> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
+
+        RestClient.getInstance().getUserService().getSelf().enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful()) {
+                    setUserProfile(response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
+
     }
 
     @Override
@@ -57,5 +93,14 @@ public class UserProfileActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setUserProfile(User user) {
+        collapsingToolbar.setTitle(
+                user.getFirst_name()
+                        + " "
+                        + user.getLast_name()
+        );
+        Picasso.with(this).load(user.getProfile_pic()).into(ivProfilePic);
     }
 }

@@ -11,6 +11,7 @@ import android.widget.EditText;
 
 import com.radiuslabs.locus.models.AccessToken;
 import com.radiuslabs.locus.models.User;
+import com.radiuslabs.locus.persistence.AppPersistence;
 import com.radiuslabs.locus.restservices.RestClient;
 
 import retrofit2.Call;
@@ -48,6 +49,8 @@ public class LoginActivity extends ActionBarActivity {
                         progressDialog.dismiss();
                         if (response.isSuccessful()) {
                             Log.d(TAG, "Access Token: " + response.body());
+                            AppPersistence persistence = new AppPersistence(LoginActivity.this);
+                            persistence.setAccessToken(response.body().getAccess_token());
                             RestClient.getInstance().setAccessToken(response.body().getAccess_token());
                             Intent intent = new Intent(LoginActivity.this, NewsFeedActivity.class);
                             startActivity(intent);

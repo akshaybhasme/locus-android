@@ -8,7 +8,7 @@ public class Story {
     private String type = "image";
     private String content_url = "http://www.odysseyart.net/Entertainment/EntertainmentFiles/BatmanRainyKnight-12x18print_thb.jpg";
     private String content_text;
-    private List<Double> story_location;
+    private StoryLocation story_location;
     private String topic_id = "1";
     private String user_id;
     private List<Comment> story_comments;
@@ -16,7 +16,7 @@ public class Story {
     private List<String> likes;
 
     public Story() {
-        story_location = new ArrayList<>();
+        story_location = new StoryLocation();
     }
 
     public String getContent_url() {
@@ -35,14 +35,12 @@ public class Story {
         this.content_text = content_text;
     }
 
-    public List<Double> getLocation() {
+    public StoryLocation getLocation() {
         return story_location;
     }
 
     public void setLocation(double latitude, double longitude) {
-        this.story_location.clear();
-        this.story_location.add(latitude);
-        this.story_location.add(longitude);
+        this.story_location.setLatLong(latitude, longitude);
     }
 
     public String getTopic_id() {
@@ -83,6 +81,38 @@ public class Story {
 
     public void setLikes(List<String> likes) {
         this.likes = likes;
+    }
+
+    public class StoryLocation {
+        private String type;
+
+        private List<Double> coordinates;
+
+        public StoryLocation() {
+            coordinates = new ArrayList<>();
+        }
+
+        public void setLatLong(double lat, double lon) {
+            coordinates.clear();
+            coordinates.add(lon);
+            coordinates.add(lat);
+        }
+
+        public List<Double> getCoordinates() {
+            return coordinates;
+        }
+
+        public void setCoordinates(List<Double> coordinates) {
+            this.coordinates = coordinates;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
     }
 
 }

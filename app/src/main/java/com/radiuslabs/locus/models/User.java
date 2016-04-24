@@ -12,6 +12,8 @@ public class User {
     private String password;
     private List<Interest> interests;
 
+    private String profile_pic;
+
     public String getEmail_id() {
         return email;
     }
@@ -66,6 +68,14 @@ public class User {
 
     public void setInterests(List<Interest> interests) {
         this.interests = interests;
+    }
+
+    public String getProfile_pic() {
+        return profile_pic;
+    }
+
+    public void setProfile_pic(String profile_pic) {
+        this.profile_pic = profile_pic;
     }
 
     public static class Interest{

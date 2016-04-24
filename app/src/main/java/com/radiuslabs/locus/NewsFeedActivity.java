@@ -9,8 +9,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ListView;
 
+import com.radiuslabs.locus.adapters.NavigationDrawerAdapter;
 import com.radiuslabs.locus.adapters.NewsFeedAdapter;
+import com.radiuslabs.locus.models.Story;
+import com.radiuslabs.locus.persistence.AppPersistence;
+
+import java.util.ArrayList;
 
 public class NewsFeedActivity extends AppCompatActivity {
 
@@ -37,11 +43,13 @@ public class NewsFeedActivity extends AppCompatActivity {
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        // specify an adapter (see also next example)
-        String[] myDataset = {"Akshay", "Akshay", "Akshay", "Akshay", "Akshay", "Akshay", "Akshay"};
-        mAdapter = new NewsFeedAdapter(myDataset);
+        mAdapter = new NewsFeedAdapter(new ArrayList<Story>());
         mRecyclerView.setAdapter(mAdapter);
 
+        NavigationDrawerAdapter adapter = new NavigationDrawerAdapter(NewsFeedActivity.this);
+        adapter.setItems(Util.getNavigationItems());
+        ListView nav = (ListView) findViewById(R.id.left_drawer);
+        nav.setAdapter(adapter);
     }
 
     @Override
@@ -67,6 +75,11 @@ public class NewsFeedActivity extends AppCompatActivity {
             case R.id.action_post:
                 Intent postIntent = new Intent(NewsFeedActivity.this, StoryCaptureActivity.class);
                 startActivity(postIntent);
+                return true;
+
+            case R.id.action_logout:
+                new AppPersistence(this).setAccessToken(null);
+                finish();
                 return true;
         }
         return super.onOptionsItemSelected(item);

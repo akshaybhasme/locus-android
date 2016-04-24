@@ -10,6 +10,7 @@ import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 
+import com.radiuslabs.locus.models.DrawerItem;
 import com.radiuslabs.locus.models.User;
 
 import java.io.File;
@@ -22,6 +23,14 @@ public class Util {
 
     public static boolean isStringEmpty(String str){
         return str == null || str.length() == 0;
+    }
+
+    public static List<DrawerItem> getNavigationItems() {
+        List<DrawerItem> items = new ArrayList<>();
+        items.add(new DrawerItem(R.drawable.ic_search_white_48dp, "Search"));
+        items.add(new DrawerItem(R.drawable.ic_face_white_48dp, "Profile"));
+        items.add(new DrawerItem(R.drawable.ic_backup_white_48dp, "Logout"));
+        return items;
     }
 
     public static Uri openImageIntent(Activity context, int REQUEST_IMAGE_CAPTURE) {
