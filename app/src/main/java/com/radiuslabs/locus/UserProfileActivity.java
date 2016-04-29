@@ -8,8 +8,10 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.radiuslabs.locus.adapters.NewsFeedAdapter;
+import com.radiuslabs.locus.imagetransformations.CircleTransform;
 import com.radiuslabs.locus.models.Story;
 import com.radiuslabs.locus.models.User;
 import com.radiuslabs.locus.restservices.RestClient;
@@ -96,11 +98,9 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void setUserProfile(User user) {
-        collapsingToolbar.setTitle(
-                user.getFirst_name()
-                        + " "
-                        + user.getLast_name()
-        );
-        Picasso.with(this).load(user.getProfile_pic()).into(ivProfilePic);
+        String fullName = user.getFirst_name() + " " + user.getLast_name();
+//        collapsingToolbar.setTitle(fullName);
+        Picasso.with(this).load(user.getProfile_pic()).transform(new CircleTransform()).into(ivProfilePic);
+        ((TextView) findViewById(R.id.tvUserName)).setText(fullName);
     }
 }

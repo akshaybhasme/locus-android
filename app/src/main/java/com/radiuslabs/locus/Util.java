@@ -18,6 +18,8 @@ import java.util.List;
 
 public class Util {
 
+    public static final int imageMaxSize = 1440;
+
     public static User user = null;
 
     public static boolean isStringEmpty(String str){

@@ -52,7 +52,7 @@ public class LoginActivity extends ActionBarActivity {
                             AppPersistence persistence = new AppPersistence(LoginActivity.this);
                             persistence.setAccessToken(response.body().getAccess_token());
                             RestClient.getInstance().setAccessToken(response.body().getAccess_token());
-                            Intent intent = new Intent(LoginActivity.this, NewsFeedActivity.class);
+                            Intent intent = new Intent(LoginActivity.this, LauncherActivity.class);
                             startActivity(intent);
                             finish();
                         } else {

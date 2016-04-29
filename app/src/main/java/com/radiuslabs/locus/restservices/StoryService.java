@@ -12,6 +12,8 @@ import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface StoryService {
 
@@ -24,5 +26,10 @@ public interface StoryService {
     @Multipart
     @POST("/api/stories/upload")
     Call<ResponseBody> uploadImage(@Part MultipartBody.Part file);
+
+    @GET("/api/geofeeds/location/{page}")
+    Call<List<Story>> getNewsFeed(@Path("page") int page,
+                                  @Query("latitude") double lat,
+                                  @Query("longitude") double lon);
 
 }

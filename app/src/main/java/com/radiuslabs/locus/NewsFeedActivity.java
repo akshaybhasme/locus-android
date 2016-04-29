@@ -1,6 +1,9 @@
 package com.radiuslabs.locus;
 
 import android.content.Intent;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -16,16 +19,23 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.radiuslabs.locus.adapters.NewsFeedAdapter;
+import com.radiuslabs.locus.imagetransformations.CircleTransform;
 import com.radiuslabs.locus.models.Story;
 import com.radiuslabs.locus.persistence.AppPersistence;
+import com.radiuslabs.locus.restservices.RestClient;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class NewsFeedActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private NewsFeedAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private DrawerLayout drawerLayout;
 
@@ -58,7 +68,7 @@ public class NewsFeedActivity extends AppCompatActivity {
         TextView name = (TextView) header.findViewById(R.id.tvName);
         name.setText(Util.user.getFirst_name() + " " + Util.user.getLast_name());
         ImageView ivProfile = (ImageView) header.findViewById(R.id.ivProfilePic);
-        Picasso.with(this).load(Util.user.getProfile_pic()).into(ivProfile);
+        Picasso.with(this).load(Util.user.getProfile_pic()).transform(new CircleTransform()).into(ivProfile);
 
         header.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,6 +98,26 @@ public class NewsFeedActivity extends AppCompatActivity {
                 }
 
                 return false;
+            }
+        });
+
+        // Get the location manager
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        String bestProvider = locationManager.getBestProvider(criteria, false);
+        Location location = locationManager.getLastKnownLocation(bestProvider);
+
+        RestClient.getInstance().getStoryService().getNewsFeed(1, location.getLatitude(), location.getLongitude()).enqueue(new Callback<List<Story>>() {
+            @Override
+            public void onResponse(Call<List<Story>> call, Response<List<Story>> response) {
+                if (response.isSuccessful()) {
+                    mAdapter.setStories(response.body());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Story>> call, Throwable t) {
+                t.printStackTrace();
             }
         });
 

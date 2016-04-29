@@ -1,19 +1,12 @@
 package com.radiuslabs.locus;
 
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Parcelable;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -25,8 +18,6 @@ import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -93,60 +84,24 @@ public class StoryCaptureActivity extends Activity {
                 } else {
                     selectedImageUri = data.getData();
                 }
-                Log.d(TAG, "Path: " + selectedImageUri.getPath());
                 croppedImageUri = Util.getImageUri(true);
-                Crop.of(selectedImageUri, croppedImageUri).start(StoryCaptureActivity.this, REQUEST_CROP_CAPTURE);
+                Crop.of(selectedImageUri, croppedImageUri).withMaxSize(Util.imageMaxSize, Util.imageMaxSize).start(StoryCaptureActivity.this, REQUEST_CROP_CAPTURE);
 
             } else if (requestCode == REQUEST_CROP_CAPTURE) {
-                try {
-                    Bitmap d = MediaStore.Images.Media.getBitmap(this.getContentResolver(), croppedImageUri);
-                    int nh = (int) (d.getHeight() * (720.0 / d.getWidth()));
-                    Bitmap scaled = Bitmap.createScaledBitmap(d, 720, nh, true);
-                    imageView.setImageBitmap(scaled);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                imageView.setImageURI(croppedImageUri);
+//                try {
+//                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), croppedImageUri);
+//                    imageView.setImageBitmap(bitmap);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
 
             }
         }
     }
 
-    //TODO use Util function
     private void openImageIntent() {
-
-        // Determine Uri of camera image to save.
-        final File root = new File(Environment.getExternalStorageDirectory() + File.separator + "Locus" + File.separator);
-        root.mkdirs();
-        final String fname = "ImageName";//Utils.getUniqueImageFilename();
-        final File sdImageMainDirectory = new File(root, fname);
-        outputFileUri = Uri.fromFile(sdImageMainDirectory);
-
-        // Camera.
-        final List<Intent> cameraIntents = new ArrayList<>();
-        final Intent captureIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        final PackageManager packageManager = getPackageManager();
-        final List<ResolveInfo> listCam = packageManager.queryIntentActivities(captureIntent, 0);
-        for (ResolveInfo res : listCam) {
-            final String packageName = res.activityInfo.packageName;
-            final Intent intent = new Intent(captureIntent);
-            intent.setComponent(new ComponentName(res.activityInfo.packageName, res.activityInfo.name));
-            intent.setPackage(packageName);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-            cameraIntents.add(intent);
-        }
-
-        // Filesystem.
-        final Intent galleryIntent = new Intent();
-        galleryIntent.setType("image/*");
-        galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-
-        // Chooser of filesystem options.
-        final Intent chooserIntent = Intent.createChooser(galleryIntent, "Select Source");
-
-        // Add the camera options.
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, cameraIntents.toArray(new Parcelable[cameraIntents.size()]));
-
-        startActivityForResult(chooserIntent, REQUEST_IMAGE_CAPTURE);
+        outputFileUri = Util.openImageIntent(this, REQUEST_IMAGE_CAPTURE);
     }
 
     private void uploadImage() {

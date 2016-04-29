@@ -3,10 +3,8 @@ package com.radiuslabs.locus;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
@@ -17,8 +15,6 @@ import com.radiuslabs.locus.models.AccessToken;
 import com.radiuslabs.locus.models.User;
 import com.radiuslabs.locus.restservices.RestClient;
 import com.soundcloud.android.crop.Crop;
-
-import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -210,16 +206,15 @@ public class RegisterActivity extends Activity {
                 }
                 Log.d(TAG, "Path: " + selectedImageUri.getPath());
                 croppedImageUri = Util.getImageUri(true);
-                Crop.of(selectedImageUri, croppedImageUri).asSquare().start(RegisterActivity.this, REQUEST_CROP_CAPTURE);
+                Crop.of(selectedImageUri, croppedImageUri).asSquare().withMaxSize(720, 720).start(RegisterActivity.this, REQUEST_CROP_CAPTURE);
             } else if (requestCode == REQUEST_CROP_CAPTURE) {
-                try {
-                    Bitmap d = MediaStore.Images.Media.getBitmap(this.getContentResolver(), croppedImageUri);
-                    int nh = (int) (d.getHeight() * (720.0 / d.getWidth()));
-                    Bitmap scaled = Bitmap.createScaledBitmap(d, 720, nh, true);
-                    ivProfilePic.setImageBitmap(scaled);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                ivProfilePic.setImageURI(croppedImageUri);
+//                try {
+////                    Bitmap d = MediaStore.Images.Media.getBitmap(this.getContentResolver(), croppedImageUri);
+////                    ivProfilePic.setImageBitmap(scaled);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
 
             }
         }
