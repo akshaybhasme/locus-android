@@ -1,7 +1,6 @@
 package com.radiuslabs.locus;
 
 import android.os.Bundle;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -29,8 +28,23 @@ public class UserProfileActivity extends AppCompatActivity {
     public static final String TAG = "UserProfileActivity";
 
     private NewsFeedAdapter mAdapter;
-    private CollapsingToolbarLayout collapsingToolbar;
     private ImageView ivProfilePic;
+    private List<User> users;
+
+    private Callback<List<Story>> listStoryCallback = new Callback<List<Story>>() {
+        @Override
+        public void onResponse(Call<List<Story>> call, Response<List<Story>> response) {
+            if (response.isSuccessful()) {
+                mAdapter.setStories(response.body());
+                mAdapter.setUsers(users);
+            }
+        }
+
+        @Override
+        public void onFailure(Call<List<Story>> call, Throwable t) {
+            t.printStackTrace();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +59,7 @@ public class UserProfileActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
-//        mRecyclerView.setHasFixedSize(true);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -57,25 +68,16 @@ public class UserProfileActivity extends AppCompatActivity {
 
         ivProfilePic = (ImageView) findViewById(R.id.ivProfilePic);
 
-        RestClient.getInstance().getStoryService().getUserStories().enqueue(new Callback<List<Story>>() {
-            @Override
-            public void onResponse(Call<List<Story>> call, Response<List<Story>> response) {
-                if (response.isSuccessful()) {
-                    mAdapter.setStories(response.body());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Story>> call, Throwable t) {
-                t.printStackTrace();
-            }
-        });
+        users = new ArrayList<>();
 
         RestClient.getInstance().getUserService().getSelf().enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful()) {
-                    setUserProfile(response.body());
+                    User u = response.body();
+                    setUserProfile(u);
+                    users.add(u);
+                    RestClient.getInstance().getStoryService().getUserStories().enqueue(listStoryCallback);
                 }
             }
 
@@ -99,7 +101,6 @@ public class UserProfileActivity extends AppCompatActivity {
 
     private void setUserProfile(User user) {
         String fullName = user.getFirst_name() + " " + user.getLast_name();
-//        collapsingToolbar.setTitle(fullName);
         Picasso.with(this).load(user.getProfile_pic()).transform(new CircleTransform()).into(ivProfilePic);
         ((TextView) findViewById(R.id.tvUserName)).setText(fullName);
     }

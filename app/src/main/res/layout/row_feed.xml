@@ -72,6 +72,7 @@
             android:gravity="right">
 
             <ImageButton
+                android:id="@+id/ibLike"
                 android:background="@drawable/button_feed_item"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
@@ -80,6 +81,7 @@
                 android:layout_marginRight="10dp" />
 
             <ImageButton
+                android:id="@+id/ibComment"
                 android:background="@drawable/button_feed_item"
                 android:layout_width="30dp"
                 android:layout_height="30dp"

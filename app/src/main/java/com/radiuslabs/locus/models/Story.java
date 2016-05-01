@@ -1,11 +1,20 @@
 package com.radiuslabs.locus.models;
 
+import android.util.Log;
+
+import com.radiuslabs.locus.Util;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Story {
 
+    public static final String TAG = "Story";
+
+    private MongoId _id;
+
     private String type = "image";
+
     private String content_url = "http://www.odysseyart.net/Entertainment/EntertainmentFiles/BatmanRainyKnight-12x18print_thb.jpg";
     private String content_text;
     private StoryLocation story_location;
@@ -13,10 +22,22 @@ public class Story {
     private String user_id;
     private List<Comment> story_comments;
     private List<String> story_hashtags;
-    private List<String> likes;
+    private List<Like> likes;
+
+    private boolean isLiked = false;
 
     public Story() {
         story_location = new StoryLocation();
+        likes = new ArrayList<>();
+        story_hashtags = new ArrayList<>();
+    }
+
+    public String get_id() {
+        return _id.get$oid();
+    }
+
+    public void set_id(MongoId _id) {
+        this._id = _id;
     }
 
     public String getContent_url() {
@@ -75,12 +96,30 @@ public class Story {
         this.story_hashtags = hashtags;
     }
 
-    public List<String> getLikes() {
+    public List<Like> getLikes() {
         return likes;
     }
 
-    public void setLikes(List<String> likes) {
+    public void setLikes(List<Like> likes) {
         this.likes = likes;
+    }
+
+    public boolean isLiked() {
+        return isLiked;
+    }
+
+    public void setIsLiked(boolean isLiked) {
+        this.isLiked = isLiked;
+        if (!isLiked) {
+            Like l = null;
+            for (Like like : likes) {
+                if (like.getUser_id().equals(Util.user.get_id())) {
+                    l = like;
+                    Log.d(TAG, "Like removed from model");
+                }
+            }
+            likes.remove(l);
+        }
     }
 
     public class StoryLocation {

@@ -7,10 +7,12 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -23,10 +25,10 @@ import com.radiuslabs.locus.imagetransformations.CircleTransform;
 import com.radiuslabs.locus.models.Story;
 import com.radiuslabs.locus.persistence.AppPersistence;
 import com.radiuslabs.locus.restservices.RestClient;
+import com.radiuslabs.locus.restservices.responses.NewsFeedResponse;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -45,8 +47,13 @@ public class NewsFeedActivity extends AppCompatActivity {
         setContentView(R.layout.activity_news_feed);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-
         setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(android.support.design.R.drawable.abc_ic_menu_moreoverflow_mtrl_alpha);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
 
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
 
@@ -107,16 +114,17 @@ public class NewsFeedActivity extends AppCompatActivity {
         String bestProvider = locationManager.getBestProvider(criteria, false);
         Location location = locationManager.getLastKnownLocation(bestProvider);
 
-        RestClient.getInstance().getStoryService().getNewsFeed(1, location.getLatitude(), location.getLongitude()).enqueue(new Callback<List<Story>>() {
+        RestClient.getInstance().getStoryService().getNewsFeed(1, location.getLatitude(), location.getLongitude()).enqueue(new Callback<NewsFeedResponse>() {
             @Override
-            public void onResponse(Call<List<Story>> call, Response<List<Story>> response) {
+            public void onResponse(Call<NewsFeedResponse> call, Response<NewsFeedResponse> response) {
                 if (response.isSuccessful()) {
-                    mAdapter.setStories(response.body());
+                    mAdapter.setStories(response.body().getStories());
+                    mAdapter.setUsers(response.body().getUsers());
                 }
             }
 
             @Override
-            public void onFailure(Call<List<Story>> call, Throwable t) {
+            public void onFailure(Call<NewsFeedResponse> call, Throwable t) {
                 t.printStackTrace();
             }
         });
@@ -137,6 +145,9 @@ public class NewsFeedActivity extends AppCompatActivity {
                 Intent postIntent = new Intent(NewsFeedActivity.this, StoryCaptureActivity.class);
                 startActivity(postIntent);
                 return true;
+
+            case android.R.id.home:
+                drawerLayout.openDrawer(Gravity.LEFT);
         }
         return super.onOptionsItemSelected(item);
     }

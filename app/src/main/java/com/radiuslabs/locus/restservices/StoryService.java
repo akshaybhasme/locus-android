@@ -1,6 +1,7 @@
 package com.radiuslabs.locus.restservices;
 
 import com.radiuslabs.locus.models.Story;
+import com.radiuslabs.locus.restservices.responses.NewsFeedResponse;
 
 import java.util.List;
 
@@ -8,6 +9,7 @@ import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -28,8 +30,14 @@ public interface StoryService {
     Call<ResponseBody> uploadImage(@Part MultipartBody.Part file);
 
     @GET("/api/geofeeds/location/{page}")
-    Call<List<Story>> getNewsFeed(@Path("page") int page,
+    Call<NewsFeedResponse> getNewsFeed(@Path("page") int page,
                                   @Query("latitude") double lat,
                                   @Query("longitude") double lon);
+
+    @POST("/api/stories/{storyId}/likes")
+    Call<ResponseBody> likeStory(@Path("storyId") String storyId);
+
+    @DELETE("/api/stories/{storyId}/likes")
+    Call<ResponseBody> unlikeStory(@Path("storyId") String storyId);
 
 }

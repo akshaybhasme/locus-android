@@ -4,15 +4,25 @@ import java.util.List;
 
 public class User {
 
+    private MongoId _id;
+
     private String email;
+
     private String first_name;
     private String last_name;
     private String gender;
     private String username;
     private String password;
     private List<Interest> interests;
-
     private String profile_pic;
+
+    public String get_id() {
+        return _id.get$oid();
+    }
+
+    public void set_id(MongoId _id) {
+        this._id = _id;
+    }
 
     public String getEmail_id() {
         return email;
@@ -36,6 +46,10 @@ public class User {
 
     public void setLast_name(String last_name) {
         this.last_name = last_name;
+    }
+
+    public String getFullName() {
+        return first_name + " " + last_name;
     }
 
     public String getGender() {
