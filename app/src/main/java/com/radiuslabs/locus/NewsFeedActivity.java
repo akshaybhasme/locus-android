@@ -65,7 +65,7 @@ public class NewsFeedActivity extends AppCompatActivity {
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new NewsFeedAdapter(new ArrayList<Story>());
+        mAdapter = new NewsFeedAdapter(new ArrayList<Story>(), getSupportFragmentManager());
         mRecyclerView.setAdapter(mAdapter);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigationView);

@@ -1,5 +1,6 @@
 package com.radiuslabs.locus.adapters;
 
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.radiuslabs.locus.CommentsDialog;
 import com.radiuslabs.locus.R;
 import com.radiuslabs.locus.Util;
 import com.radiuslabs.locus.imagetransformations.CircleTransform;
@@ -34,11 +36,13 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
     private List<Story> stories;
     private HashMap<String, User> users;
     private Transformation profilePicTransformation;
+    private FragmentManager fragmentManager;
 
-    public NewsFeedAdapter(List<Story> stories) {
+    public NewsFeedAdapter(List<Story> stories, FragmentManager fragmentManager) {
         this.stories = stories;
         users = new HashMap<>();
         profilePicTransformation = new CircleTransform();
+        this.fragmentManager = fragmentManager;
     }
     @Override
     public NewsFeedAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -126,7 +130,10 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
         holder.ibComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                CommentsDialog commentsDialog = new CommentsDialog();
+                commentsDialog.show(fragmentManager, story.get_id());
+                commentsDialog.setComments(story.getComments());
+                commentsDialog.setStoryId(story.get_id());
             }
         });
     }

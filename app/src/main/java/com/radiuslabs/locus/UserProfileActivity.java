@@ -63,7 +63,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        mAdapter = new NewsFeedAdapter(new ArrayList<Story>());
+        mAdapter = new NewsFeedAdapter(new ArrayList<Story>(), getSupportFragmentManager());
         mRecyclerView.setAdapter(mAdapter);
 
         ivProfilePic = (ImageView) findViewById(R.id.ivProfilePic);

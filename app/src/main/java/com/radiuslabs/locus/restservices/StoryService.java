@@ -1,5 +1,6 @@
 package com.radiuslabs.locus.restservices;
 
+import com.radiuslabs.locus.models.Comment;
 import com.radiuslabs.locus.models.Story;
 import com.radiuslabs.locus.restservices.responses.NewsFeedResponse;
 
@@ -40,4 +41,6 @@ public interface StoryService {
     @DELETE("/api/stories/{storyId}/likes")
     Call<ResponseBody> unlikeStory(@Path("storyId") String storyId);
 
+    @POST("/api/stories/{storyId}/comments")
+    Call<ResponseBody> addComment(@Path("storyId") String storyId, @Body Comment comment);
 }

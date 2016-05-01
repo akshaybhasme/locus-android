@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.radiuslabs.locus.R;
 import com.radiuslabs.locus.models.Comment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHolder> {
@@ -33,11 +34,24 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+        notifyDataSetChanged();
+    }
+
+    public void addComment(Comment comment) {
+        if (this.comments == null)
+            this.comments = new ArrayList<>();
+        comments.add(comment);
+        notifyDataSetChanged();
+    }
+
+    public void deleteComment(Comment comment) {
+        this.comments.remove(comment);
+        notifyDataSetChanged();
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = inflater.inflate(R.layout.row_interest, new LinearLayout(context));
+        View v = inflater.inflate(R.layout.row_comment, new LinearLayout(context));
 
         return new ViewHolder(v);
     }
