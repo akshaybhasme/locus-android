@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvComments"
+        android:scrollbars="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/llCommentAdd" />
+
+    <LinearLayout
+        android:id="@+id/llCommentAdd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_alignParentBottom="true"
+        android:weightSum="100">
+
+        <EditText
+            android:id="@+id/etComment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Write a comment"
+            android:inputType="textCapSentences"
+            android:layout_weight="95" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Post"
+            android:layout_weight="5" />
+
+    </LinearLayout>
+
+</RelativeLayout>
