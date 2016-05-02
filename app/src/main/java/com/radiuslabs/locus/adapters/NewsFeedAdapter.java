@@ -63,12 +63,14 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
         Picasso
                 .with(holder.ivContent.getContext())
                 .load(story.getContent_url())
+                .placeholder(R.drawable.imageplaceholder)
                 .into(holder.ivContent);
 
         Picasso
                 .with(holder.ivProfilePic.getContext())
                 .load(user.getProfile_pic())
                 .transform(profilePicTransformation)
+                .placeholder(R.drawable.placeholder_user)
                 .into(holder.ivProfilePic);
 
         holder.ibLike.setImageResource(R.drawable.ic_favorite_border_black_48dp);
@@ -134,6 +136,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
                 commentsDialog.show(fragmentManager, story.get_id());
                 commentsDialog.setComments(story.getComments());
                 commentsDialog.setStoryId(story.get_id());
+                commentsDialog.setUsers(users);
             }
         });
     }

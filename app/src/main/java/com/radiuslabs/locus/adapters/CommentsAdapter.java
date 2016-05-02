@@ -10,17 +10,24 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.radiuslabs.locus.R;
+import com.radiuslabs.locus.imagetransformations.CircleTransform;
 import com.radiuslabs.locus.models.Comment;
+import com.radiuslabs.locus.models.User;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHolder> {
 
     private List<Comment> comments;
+    private HashMap<String, User> users;
 
     private Context context;
     private LayoutInflater inflater;
+
+    private CircleTransform transform = new CircleTransform();
 
     public CommentsAdapter(List<Comment> comments, Context context) {
         this.comments = comments;
@@ -49,6 +56,11 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
         notifyDataSetChanged();
     }
 
+    public void setUsers(HashMap<String, User> users) {
+        this.users = users;
+        notifyDataSetChanged();
+    }
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_comment, new LinearLayout(context));
@@ -58,7 +70,20 @@ public class CommentsAdapter extends RecyclerView.Adapter<CommentsAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.tvText.setText(comments.get(position).getText());
+        Comment comment = comments.get(position);
+        User user = users.get(comment.getUserId());
+
+        holder.tvText.setText(comment.getText());
+
+        if (user != null) {
+            holder.tvName.setText(user.getFullName());
+            Picasso
+                    .with(context)
+                    .load(user.getProfile_pic())
+                    .transform(transform)
+                    .placeholder(R.drawable.placeholder_user)
+                    .into(holder.ivProfilePic);
+        }
     }
 
     @Override

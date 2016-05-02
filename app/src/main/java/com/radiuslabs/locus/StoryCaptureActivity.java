@@ -1,6 +1,7 @@
 package com.radiuslabs.locus;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
@@ -39,6 +40,8 @@ public class StoryCaptureActivity extends Activity {
 
     private Uri outputFileUri, croppedImageUri;
 
+    private ProgressDialog pd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +60,11 @@ public class StoryCaptureActivity extends Activity {
         findViewById(R.id.fabUploadStory).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                pd = new ProgressDialog(StoryCaptureActivity.this, R.style.ProgressDialogTheme);
+                pd.setCancelable(false);
+                pd.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
+                pd.setMessage("Publishing story...");
+                pd.show();
                 uploadImage();
             }
         });
@@ -89,13 +97,6 @@ public class StoryCaptureActivity extends Activity {
 
             } else if (requestCode == REQUEST_CROP_CAPTURE) {
                 imageView.setImageURI(croppedImageUri);
-//                try {
-//                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), croppedImageUri);
-//                    imageView.setImageBitmap(bitmap);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-
             }
         }
     }
@@ -153,6 +154,9 @@ public class StoryCaptureActivity extends Activity {
             @Override
             public void onResponse(Call<Story> call, Response<Story> response) {
                 if (response.isSuccessful()) {
+                    if (pd != null && pd.isShowing())
+                        pd.dismiss();
+                    setResult(RESULT_OK);
                     finish();
                 }
             }

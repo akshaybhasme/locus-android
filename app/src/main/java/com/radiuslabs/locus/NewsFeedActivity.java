@@ -36,6 +36,8 @@ import retrofit2.Response;
 
 public class NewsFeedActivity extends AppCompatActivity {
 
+    public static final int REQUEST_POST_STORY = 111;
+
     private RecyclerView mRecyclerView;
     private NewsFeedAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -50,7 +52,7 @@ public class NewsFeedActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setHomeAsUpIndicator(android.support.design.R.drawable.abc_ic_menu_moreoverflow_mtrl_alpha);
+//            actionBar.setHomeAsUpIndicator(android.support.design.R.drawable.abc_ic_menu_moreoverflow_mtrl_alpha);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
@@ -108,6 +110,44 @@ public class NewsFeedActivity extends AppCompatActivity {
             }
         });
 
+        getStories();
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_news_feed, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_post:
+                Intent postIntent = new Intent(NewsFeedActivity.this, StoryCaptureActivity.class);
+                startActivityForResult(postIntent, REQUEST_POST_STORY);
+                return true;
+
+            case android.R.id.home:
+                drawerLayout.openDrawer(Gravity.LEFT);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_POST_STORY:
+                    getStories();
+                    return;
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void getStories() {
         // Get the location manager
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         Criteria criteria = new Criteria();
@@ -128,27 +168,6 @@ public class NewsFeedActivity extends AppCompatActivity {
                 t.printStackTrace();
             }
         });
-
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.activity_news_feed, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.action_post:
-                Intent postIntent = new Intent(NewsFeedActivity.this, StoryCaptureActivity.class);
-                startActivity(postIntent);
-                return true;
-
-            case android.R.id.home:
-                drawerLayout.openDrawer(Gravity.LEFT);
-        }
-        return super.onOptionsItemSelected(item);
-    }
 }

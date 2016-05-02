@@ -13,9 +13,11 @@ import android.widget.EditText;
 
 import com.radiuslabs.locus.adapters.CommentsAdapter;
 import com.radiuslabs.locus.models.Comment;
+import com.radiuslabs.locus.models.User;
 import com.radiuslabs.locus.restservices.RestClient;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -25,11 +27,12 @@ import retrofit2.Response;
 
 public class CommentsDialog extends DialogFragment {
 
-    private CommentsAdapter adapter;
-    private List<Comment> comments;
-    private EditText etComment;
-
     private String storyId;
+    private List<Comment> comments;
+    private HashMap<String, User> users;
+
+    private CommentsAdapter adapter;
+    private EditText etComment;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,6 +42,11 @@ public class CommentsDialog extends DialogFragment {
             comments = new ArrayList<>();
 
         adapter = new CommentsAdapter(comments, getActivity());
+
+        if (users == null)
+            users = new HashMap<>();
+
+        adapter.setUsers(users);
     }
 
     @Nullable
@@ -71,6 +79,13 @@ public class CommentsDialog extends DialogFragment {
         this.comments = comments;
         if (adapter != null)
             adapter.setComments(comments);
+    }
+
+    public void setUsers(HashMap<String, User> users) {
+        this.users = users;
+        if (adapter != null) {
+            adapter.setUsers(users);
+        }
     }
 
     private void addComment() {
