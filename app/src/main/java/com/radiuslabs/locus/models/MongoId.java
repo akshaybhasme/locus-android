@@ -1,6 +1,8 @@
 package com.radiuslabs.locus.models;
 
-public class MongoId {
+import java.io.Serializable;
+
+public class MongoId implements Serializable {
 
     private String $oid;
 

@@ -31,31 +31,77 @@
                 android:layout_gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                card_view:cardCornerRadius="4dp">
+                card_view:cardCornerRadius="4dp"
+                card_view:cardElevation="5dp"
+                card_view:cardUseCompatPadding="true">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <ImageView
-                        android:id="@+id/ibSelectMedia"
+                    <LinearLayout
+                        android:id="@+id/llProfile"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/imageplaceholder"
-                        android:scaleType="fitCenter"
-                        android:adjustViewBounds="true" />
+                        android:orientation="horizontal"
+                        android:padding="5dp">
 
-                    <EditText
+                        <ImageView
+                            android:id="@+id/ivProfilePic"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:src="@drawable/placeholder_user" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="5dp">
+
+                            <TextView
+                                android:id="@+id/tvName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="John Doe"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvLocation"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Tap here to select location ->"
+                                android:textColor="#0099ff" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textMultiLine|textCapSentences"
-                        android:ems="10"
-                        android:id="@+id/etStoryText"
-                        android:layout_below="@+id/ibSelectMedia"
-                        android:layout_margin="10dp"
-                        android:background="#00000000"
-                        android:hint="Say something. Tap here." />
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/ibSelectMedia"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/imageplaceholder"
+                            android:scaleType="fitCenter"
+                            android:adjustViewBounds="true" />
+
+                        <EditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textMultiLine|textCapSentences"
+                            android:ems="10"
+                            android:id="@+id/etStoryText"
+                            android:layout_below="@+id/ibSelectMedia"
+                            android:layout_margin="10dp"
+                            android:background="#00000000"
+                            android:hint="Say something. Tap here." />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 

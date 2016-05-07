@@ -4,8 +4,6 @@ import com.radiuslabs.locus.models.Comment;
 import com.radiuslabs.locus.models.Story;
 import com.radiuslabs.locus.restservices.responses.NewsFeedResponse;
 
-import java.util.List;
-
 import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -23,8 +21,8 @@ public interface StoryService {
     @POST("/api/stories")
     Call<Story> createStory(@Body Story story);
 
-    @GET("/api/stories")
-    Call<List<Story>> getUserStories();
+    @GET("/api/users/{userId}/stories")
+    Call<NewsFeedResponse> getUserStories(@Path("userId") String userId);
 
     @Multipart
     @POST("/api/stories/upload")

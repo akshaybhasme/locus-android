@@ -3,7 +3,9 @@ package com.radiuslabs.locus;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -12,13 +14,18 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.radiuslabs.locus.imagetransformations.CircleTransform;
 import com.radiuslabs.locus.models.Story;
 import com.radiuslabs.locus.restservices.RestClient;
 import com.soundcloud.android.crop.Crop;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -41,6 +48,8 @@ public class StoryCaptureActivity extends Activity {
     private Uri outputFileUri, croppedImageUri;
 
     private ProgressDialog pd;
+
+    private Location location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +75,33 @@ public class StoryCaptureActivity extends Activity {
                 pd.setMessage("Publishing story...");
                 pd.show();
                 uploadImage();
+            }
+        });
+
+
+        // Get the location manager
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        String bestProvider = locationManager.getBestProvider(criteria, true);
+        location = locationManager.getLastKnownLocation(bestProvider);
+
+        ImageView ivProfilePic = (ImageView) findViewById(R.id.ivProfilePic);
+        TextView tvName = (TextView) findViewById(R.id.tvName);
+
+        if (Util.user != null) {
+            tvName.setText(Util.user.getFullName());
+            Picasso
+                    .with(this)
+                    .load(Util.user.getProfile_pic())
+                    .transform(new CircleTransform())
+                    .placeholder(R.drawable.placeholder_user)
+                    .into(ivProfilePic);
+        }
+
+        findViewById(R.id.llProfile).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getAddresses(location);
             }
         });
 
@@ -119,7 +155,7 @@ public class StoryCaptureActivity extends Activity {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     try {
-                        String contentUrl = response.body().string();
+                        String contentUrl = response.body().string().replace("\"", "");
                         Log.d(TAG, "Image file resp: " + contentUrl);
                         publishStory(contentUrl);
                     } catch (IOException e) {
@@ -139,11 +175,6 @@ public class StoryCaptureActivity extends Activity {
     private void publishStory(String contentUrl) {
         Story story = new Story();
         story.setContent_text(storyText.getText().toString());
-        // Get the location manager
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        String bestProvider = locationManager.getBestProvider(criteria, false);
-        Location location = locationManager.getLastKnownLocation(bestProvider);
         Log.d(TAG, location.getLatitude() + " " + location.getLongitude());
         story.setLocation(location.getLatitude(), location.getLongitude());
 
@@ -167,6 +198,21 @@ public class StoryCaptureActivity extends Activity {
             }
         });
 
+    }
+
+    private void getAddresses(Location location) {
+        Geocoder geocoder = new Geocoder(StoryCaptureActivity.this, Locale.getDefault());
+        List<Address> addresses = null;
+        try {
+            addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 10);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (addresses != null) {
+            for (Address address : addresses) {
+                Log.d(TAG, address.getAddressLine(0));
+            }
+        }
     }
 
 }

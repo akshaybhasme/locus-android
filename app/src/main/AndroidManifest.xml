@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <uses-feature
@@ -36,7 +37,8 @@
             android:theme="@style/AppThemeForToolbar" />
         <activity
             android:name=".StoryCaptureActivity"
-            android:label="@string/title_activity_story_capture" />
+            android:label="@string/title_activity_story_capture"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".UserProfileActivity"
             android:theme="@style/AppThemeForToolbar" />

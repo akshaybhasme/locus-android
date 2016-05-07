@@ -1,8 +1,9 @@
 package com.radiuslabs.locus.models;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class User {
+public class User implements Serializable {
 
     private MongoId _id;
 
@@ -92,7 +93,7 @@ public class User {
         this.profile_pic = profile_pic;
     }
 
-    public static class Interest{
+    public static class Interest implements Serializable {
 
         private String text;
 

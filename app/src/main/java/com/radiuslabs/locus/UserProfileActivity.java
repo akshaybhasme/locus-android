@@ -14,6 +14,7 @@ import com.radiuslabs.locus.imagetransformations.CircleTransform;
 import com.radiuslabs.locus.models.Story;
 import com.radiuslabs.locus.models.User;
 import com.radiuslabs.locus.restservices.RestClient;
+import com.radiuslabs.locus.restservices.responses.NewsFeedResponse;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -27,21 +28,24 @@ public class UserProfileActivity extends AppCompatActivity {
 
     public static final String TAG = "UserProfileActivity";
 
+    public static final String EXTRA_USER_ID = "UserID";
+
     private NewsFeedAdapter mAdapter;
     private ImageView ivProfilePic;
     private List<User> users;
 
-    private Callback<List<Story>> listStoryCallback = new Callback<List<Story>>() {
+    private Callback<NewsFeedResponse> listStoryCallback = new Callback<NewsFeedResponse>() {
         @Override
-        public void onResponse(Call<List<Story>> call, Response<List<Story>> response) {
+        public void onResponse(Call<NewsFeedResponse> call, Response<NewsFeedResponse> response) {
             if (response.isSuccessful()) {
-                mAdapter.setStories(response.body());
+                mAdapter.setStories(response.body().getStories());
+                users.addAll(response.body().getUsers());
                 mAdapter.setUsers(users);
             }
         }
 
         @Override
-        public void onFailure(Call<List<Story>> call, Throwable t) {
+        public void onFailure(Call<NewsFeedResponse> call, Throwable t) {
             t.printStackTrace();
         }
     };
@@ -71,23 +75,27 @@ public class UserProfileActivity extends AppCompatActivity {
 
         users = new ArrayList<>();
 
-        RestClient.getInstance().getUserService().getSelf().enqueue(new Callback<User>() {
-            @Override
-            public void onResponse(Call<User> call, Response<User> response) {
-                if (response.isSuccessful()) {
-                    User u = response.body();
-                    setUserProfile(u);
-                    users.add(u);
-                    RestClient.getInstance().getStoryService().getUserStories().enqueue(listStoryCallback);
-                }
-            }
+//        RestClient.getInstance().getUserService().getSelf().enqueue(new Callback<User>() {
+//            @Override
+//            public void onResponse(Call<User> call, Response<User> response) {
+//                if (response.isSuccessful()) {
+//                    User u = response.body();
+//                    setUserProfile(u);
+//                    users.add(u);
+//                    RestClient.getInstance().getStoryService().getUserStories().enqueue(listStoryCallback);
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<User> call, Throwable t) {
+//                t.printStackTrace();
+//            }
+//        });
 
-            @Override
-            public void onFailure(Call<User> call, Throwable t) {
-                t.printStackTrace();
-            }
-        });
-
+        User u = (User) getIntent().getSerializableExtra(EXTRA_USER_ID);
+        setUserProfile(u);
+        users.add(u);
+        RestClient.getInstance().getStoryService().getUserStories(u.get_id()).enqueue(listStoryCallback);
     }
 
     @Override

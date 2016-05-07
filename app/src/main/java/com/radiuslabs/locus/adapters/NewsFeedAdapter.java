@@ -1,5 +1,7 @@
 package com.radiuslabs.locus.adapters;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -8,22 +10,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.radiuslabs.locus.CommentsDialog;
 import com.radiuslabs.locus.R;
+import com.radiuslabs.locus.UserProfileActivity;
 import com.radiuslabs.locus.Util;
 import com.radiuslabs.locus.imagetransformations.CircleTransform;
 import com.radiuslabs.locus.models.Like;
 import com.radiuslabs.locus.models.Story;
 import com.radiuslabs.locus.models.User;
 import com.radiuslabs.locus.restservices.RestClient;
-import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import jp.wasabeef.glide.transformations.CropCircleTransformation;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -56,20 +62,26 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         final Story story = stories.get(position);
-        User user = users.get(story.getUser_id());
-        holder.tvUserName.setText(user.getFullName());
         holder.tvContentText.setText(stories.get(position).getContent_text());
+        final User user = users.get(story.getUser_id());
+        holder.tvUserName.setText(user.getFullName());
 
-        Picasso
-                .with(holder.ivContent.getContext())
-                .load(story.getContent_url())
-                .placeholder(R.drawable.imageplaceholder)
-                .into(holder.ivContent);
+        if (!Util.isStringEmpty(story.getContent_url())) {
+            holder.ivContent.setVisibility(View.VISIBLE);
+            Glide
+                    .with(holder.ivContent.getContext())
+                    .load(story.getContent_url())
+                    .placeholder(R.drawable.imageplaceholder)
+                    .into(holder.ivContent);
+        } else {
+            holder.ivContent.setVisibility(View.GONE);
+        }
 
-        Picasso
+        Glide
                 .with(holder.ivProfilePic.getContext())
                 .load(user.getProfile_pic())
-                .transform(profilePicTransformation)
+                .bitmapTransform(new CropCircleTransformation(holder.ivProfilePic.getContext()))
+//                .fit()
                 .placeholder(R.drawable.placeholder_user)
                 .into(holder.ivProfilePic);
 
@@ -139,6 +151,16 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
                 commentsDialog.setUsers(users);
             }
         });
+
+        holder.llProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Context context = holder.llProfile.getContext();
+                Intent intent = new Intent(context, UserProfileActivity.class);
+                intent.putExtra(UserProfileActivity.EXTRA_USER_ID, user);
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -153,6 +175,19 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
 
     public void setStories(List<Story> stories) {
         this.stories = stories;
+        initStories();
+        notifyDataSetChanged();
+    }
+
+    public void addStory(Story story) {
+        initStories();
+        this.stories.add(story);
+        notifyDataSetChanged();
+    }
+
+    public void addStories(List<Story> stories) {
+        initStories();
+        this.stories.addAll(stories);
         notifyDataSetChanged();
     }
 
@@ -160,6 +195,11 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
         for (User user : users) {
             this.users.put(user.get_id(), user);
         }
+    }
+
+    private void initStories() {
+        if (this.stories == null)
+            this.stories = new ArrayList<>();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -171,6 +211,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
         ImageView ivProfilePic;
         ImageButton ibLike;
         ImageButton ibComment;
+        LinearLayout llProfile;
 
         public ViewHolder(View v) {
             super(v);
@@ -181,6 +222,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
             ivProfilePic = (ImageView) v.findViewById(R.id.ivProfilePic);
             ibLike = (ImageButton) v.findViewById(R.id.ibLike);
             ibComment = (ImageButton) v.findViewById(R.id.ibComment);
+            llProfile = (LinearLayout) v.findViewById(R.id.llProfile);
         }
 
     }

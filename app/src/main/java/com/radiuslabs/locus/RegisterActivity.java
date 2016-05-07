@@ -16,6 +16,13 @@ import com.radiuslabs.locus.models.User;
 import com.radiuslabs.locus.restservices.RestClient;
 import com.soundcloud.android.crop.Crop;
 
+import java.io.File;
+import java.io.IOException;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -37,6 +44,8 @@ public class RegisterActivity extends Activity {
     private ImageView ivProfilePic;
 
     private Uri outputFileUri, croppedImageUri;
+
+    private ProgressDialog pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,17 +132,53 @@ public class RegisterActivity extends Activity {
             Snackbar.make(findViewById(R.id.rootView), "Passwords do not match", Snackbar.LENGTH_SHORT).show();
             return;
         }
-        registerUser();
+        pd = new ProgressDialog(RegisterActivity.this, R.style.ProgressDialogTheme);
+        pd.setCancelable(false);
+        pd.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
+        pd.setMessage("Creating your account...");
+        pd.show();
+        uploadImage();
     }
 
-    private void registerUser(){
+    private void uploadImage() {
+        Log.d(TAG, "File path: " + croppedImageUri.getPath());
+        File f = new File(croppedImageUri.getPath());
+        RequestBody file = RequestBody.create(MediaType.parse("multipart/form-data"), f);
+
+        MultipartBody.Part body =
+                MultipartBody.Part.createFormData("file", f.getName(), file);
+
+        Call<ResponseBody> call = RestClient.getInstance().getStoryService().uploadImage(body);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    try {
+                        String contentUrl = response.body().string().replace("\"", "");
+                        Log.d(TAG, "Image file resp: " + contentUrl);
+                        registerUser(contentUrl);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
+    }
+
+    private void registerUser(String profilePic) {
         User user = new User();
         user.setFirst_name(etFirstName.getText().toString());
         user.setLast_name(etLastName.getText().toString());
         user.setEmail_id(etEmail.getText().toString());
         user.setUser_name(etUsername.getText().toString());
         user.setPassword(etPassword.getText().toString());
-        final ProgressDialog progressDialog = ProgressDialog.show(RegisterActivity.this, "", "Please wait...");
+        user.setProfile_pic(profilePic);
         Call<User> req = RestClient.getInstance().getUserService().createUser(user);
         req.enqueue(new Callback<User>() {
             @Override
@@ -146,7 +191,7 @@ public class RegisterActivity extends Activity {
                     RestClient.getInstance().getUserService().login(u).enqueue(new Callback<AccessToken>() {
                         @Override
                         public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
-                            progressDialog.dismiss();
+                            if (pd.isShowing()) pd.dismiss();
                             if (response.isSuccessful()) {
                                 RestClient.getInstance().setAccessToken(response.body().getAccess_token());
                                 Intent intent = new Intent(RegisterActivity.this, NewsFeedActivity.class);
@@ -163,8 +208,8 @@ public class RegisterActivity extends Activity {
 
                         @Override
                         public void onFailure(Call<AccessToken> call, Throwable t) {
-                            progressDialog.dismiss();
                             t.printStackTrace();
+                            if (pd.isShowing()) pd.dismiss();
                         }
                     });
 
@@ -173,12 +218,12 @@ public class RegisterActivity extends Activity {
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
-                progressDialog.dismiss();
                 Snackbar.make(
                         findViewById(R.id.rootView),
                         "Error: " + t.getMessage(),
                         Snackbar.LENGTH_SHORT
                 ).show();
+                if (pd.isShowing()) pd.dismiss();
             }
         });
     }
@@ -209,13 +254,6 @@ public class RegisterActivity extends Activity {
                 Crop.of(selectedImageUri, croppedImageUri).asSquare().withMaxSize(720, 720).start(RegisterActivity.this, REQUEST_CROP_CAPTURE);
             } else if (requestCode == REQUEST_CROP_CAPTURE) {
                 ivProfilePic.setImageURI(croppedImageUri);
-//                try {
-////                    Bitmap d = MediaStore.Images.Media.getBitmap(this.getContentResolver(), croppedImageUri);
-////                    ivProfilePic.setImageBitmap(scaled);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-
             }
         }
     }

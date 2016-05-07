@@ -31,9 +31,14 @@ public class LauncherActivity extends Activity {
             RestClient.getInstance().getUserService().getSelf().enqueue(new Callback<User>() {
                 @Override
                 public void onResponse(Call<User> call, Response<User> response) {
-                    Util.user = response.body();
-                    Intent intent = new Intent(LauncherActivity.this, NewsFeedActivity.class);
-                    startActivity(intent);
+                    if (response.isSuccessful()) {
+                        Util.user = response.body();
+                        Intent intent = new Intent(LauncherActivity.this, NewsFeedActivity.class);
+                        startActivity(intent);
+                    } else {
+                        Intent intent = new Intent(LauncherActivity.this, LoginActivity.class);
+                        startActivity(intent);
+                    }
                     finish();
                 }
 
