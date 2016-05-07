@@ -41,4 +41,7 @@ public interface StoryService {
 
     @POST("/api/stories/{storyId}/comments")
     Call<ResponseBody> addComment(@Path("storyId") String storyId, @Body Comment comment);
+
+    @GET("/api/hashtag/{hashtag}")
+    Call<NewsFeedResponse> getStoriesWithHashtag(@Path("hashtag") String hashtag);
 }

@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.radiuslabs.locus.CommentsDialog;
 import com.radiuslabs.locus.R;
+import com.radiuslabs.locus.SearchContentActivity;
 import com.radiuslabs.locus.UserProfileActivity;
 import com.radiuslabs.locus.Util;
 import com.radiuslabs.locus.imagetransformations.CircleTransform;
@@ -24,6 +25,7 @@ import com.radiuslabs.locus.models.Story;
 import com.radiuslabs.locus.models.User;
 import com.radiuslabs.locus.restservices.RestClient;
 import com.squareup.picasso.Transformation;
+import com.volokh.danylo.hashtaghelper.HashTagHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,6 +67,8 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
         holder.tvContentText.setText(stories.get(position).getContent_text());
         final User user = users.get(story.getUser_id());
         holder.tvUserName.setText(user.getFullName());
+
+        final Context context = holder.ivContent.getContext();
 
         if (!Util.isStringEmpty(story.getContent_url())) {
             holder.ivContent.setVisibility(View.VISIBLE);
@@ -161,6 +165,19 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
                 context.startActivity(intent);
             }
         });
+
+        HashTagHelper mTextHashTagHelper = HashTagHelper.Creator.create(context.getResources().getColor(R.color.primary), new HashTagHelper.OnHashTagClickListener() {
+            @Override
+            public void onHashTagClicked(String hashTag) {
+                Intent intent = new Intent(context, SearchContentActivity.class);
+                intent.putExtra(SearchContentActivity.EXTRA_TAG, hashTag);
+                context.startActivity(intent);
+            }
+        });
+
+        // pass a TextView or any descendant of it (incliding EditText) here.
+        // Hash tags that are in the text will be hightlighed with a color passed to HasTagHelper
+        mTextHashTagHelper.handle(holder.tvContentText);
     }
 
     @Override

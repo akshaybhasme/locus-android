@@ -1,7 +1,9 @@
 package com.radiuslabs.locus;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Criteria;
@@ -12,6 +14,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -50,6 +53,8 @@ public class StoryCaptureActivity extends Activity {
     private ProgressDialog pd;
 
     private Location location;
+
+    private Story story = new Story();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,7 +106,7 @@ public class StoryCaptureActivity extends Activity {
         findViewById(R.id.llProfile).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getAddresses(location);
+                showAddressDialog();
             }
         });
 
@@ -173,7 +178,6 @@ public class StoryCaptureActivity extends Activity {
     }
 
     private void publishStory(String contentUrl) {
-        Story story = new Story();
         story.setContent_text(storyText.getText().toString());
         Log.d(TAG, location.getLatitude() + " " + location.getLongitude());
         story.setLocation(location.getLatitude(), location.getLongitude());
@@ -200,7 +204,7 @@ public class StoryCaptureActivity extends Activity {
 
     }
 
-    private void getAddresses(Location location) {
+    private List<Address> getAddresses(Location location) {
         Geocoder geocoder = new Geocoder(StoryCaptureActivity.this, Locale.getDefault());
         List<Address> addresses = null;
         try {
@@ -208,11 +212,40 @@ public class StoryCaptureActivity extends Activity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if (addresses != null) {
-            for (Address address : addresses) {
-                Log.d(TAG, address.getAddressLine(0));
-            }
+        return addresses;
+    }
+
+    private void showAddressDialog() {
+        AlertDialog.Builder builderSingle = new AlertDialog.Builder(StoryCaptureActivity.this);
+        builderSingle.setTitle("Select One Name:-");
+
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+                StoryCaptureActivity.this,
+                android.R.layout.select_dialog_singlechoice);
+
+        for (Address address : getAddresses(location)) {
+            arrayAdapter.add(address.getAddressLine(0));
         }
+
+        builderSingle.setNegativeButton(
+                "cancel",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        builderSingle.setAdapter(
+                arrayAdapter,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String strName = arrayAdapter.getItem(which);
+                        ((TextView) findViewById(R.id.tvLocation)).setText(strName);
+                    }
+                });
+        builderSingle.show();
     }
 
 }

@@ -15,7 +15,6 @@ public class RestClient {
     public static final String TAG = "RestClient";
 
     public static final String apiUrl = "http://flask-env.vf8pkwjdey.us-west-2.elasticbeanstalk.com/";
-//    public static final String apiUrl = "http://192.168.0.24:5000/";
 
     private static RestClient instance;
 
