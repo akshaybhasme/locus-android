@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -45,6 +46,7 @@ public class NewsFeedActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private NewsFeedAdapter mAdapter;
     private DrawerLayout drawerLayout;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private boolean loading;
 
@@ -119,6 +121,15 @@ public class NewsFeedActivity extends AppCompatActivity {
             }
         });
 
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mAdapter.setStories(null);
+                getStories(1);
+            }
+        });
+
         getStories(1);
 
         EndlessRecyclerOnScrollListener listener = new EndlessRecyclerOnScrollListener(mLayoutManager) {
@@ -131,6 +142,7 @@ public class NewsFeedActivity extends AppCompatActivity {
         };
 
         mRecyclerView.addOnScrollListener(listener);
+
 
     }
 
@@ -170,6 +182,7 @@ public class NewsFeedActivity extends AppCompatActivity {
 
     private void getStories(int page) {
         loading = true;
+        if (!swipeRefreshLayout.isRefreshing()) swipeRefreshLayout.setRefreshing(true);
         Location location = getLastKnownLocation();
         if (location != null) {
             RestClient.getInstance().getStoryService().getNewsFeed(page, location.getLatitude(), location.getLongitude()).enqueue(new Callback<NewsFeedResponse>() {
@@ -180,12 +193,13 @@ public class NewsFeedActivity extends AppCompatActivity {
                         mAdapter.setUsers(response.body().getUsers());
                     }
                     loading = false;
+                    swipeRefreshLayout.setRefreshing(false);
                 }
 
                 @Override
                 public void onFailure(Call<NewsFeedResponse> call, Throwable t) {
                     t.printStackTrace();
-                    loading = false;
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             });
         } else {
