@@ -13,11 +13,11 @@ import android.widget.ImageView;
 
 import com.radiuslabs.locus.models.AccessToken;
 import com.radiuslabs.locus.models.User;
+import com.radiuslabs.locus.persistence.AppPersistence;
 import com.radiuslabs.locus.restservices.RestClient;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
-import java.io.IOException;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -137,38 +137,7 @@ public class RegisterActivity extends Activity {
         pd.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
         pd.setMessage("Creating your account...");
         pd.show();
-        uploadImage();
-    }
-
-    private void uploadImage() {
-        Log.d(TAG, "File path: " + croppedImageUri.getPath());
-        File f = new File(croppedImageUri.getPath());
-        RequestBody file = RequestBody.create(MediaType.parse("multipart/form-data"), f);
-
-        MultipartBody.Part body =
-                MultipartBody.Part.createFormData("file", f.getName(), file);
-
-        Call<ResponseBody> call = RestClient.getInstance().getStoryService().uploadImage(body);
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.isSuccessful()) {
-                    try {
-                        String contentUrl = response.body().string().replace("\"", "");
-                        Log.d(TAG, "Image file resp: " + contentUrl);
-                        registerUser(contentUrl);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                t.printStackTrace();
-            }
-        });
+        registerUser("");
     }
 
     private void registerUser(String profilePic) {
@@ -187,16 +156,44 @@ public class RegisterActivity extends Activity {
                     Util.user = response.body();
                     User u = new User();
                     u.setUser_name(response.body().getUser_name());
-                    u.setPassword(response.body().getPassword());
+                    u.setPassword(etPassword.getText().toString());
                     RestClient.getInstance().getUserService().login(u).enqueue(new Callback<AccessToken>() {
                         @Override
                         public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
                             if (pd.isShowing()) pd.dismiss();
                             if (response.isSuccessful()) {
+
                                 RestClient.getInstance().setAccessToken(response.body().getAccess_token());
-                                Intent intent = new Intent(RegisterActivity.this, NewsFeedActivity.class);
-                                startActivity(intent);
-                                finish();
+
+                                AppPersistence persistence = new AppPersistence(RegisterActivity.this);
+                                persistence.setAccessToken(response.body().getAccess_token());
+
+                                if (croppedImageUri != null) {
+                                    File f = new File(croppedImageUri.getPath());
+                                    RequestBody file = RequestBody.create(MediaType.parse("multipart/form-data"), f);
+
+                                    MultipartBody.Part body =
+                                            MultipartBody.Part.createFormData("file", f.getName(), file);
+
+                                    RestClient.getInstance().getUserService().setProfilePicture(body).enqueue(new Callback<ResponseBody>() {
+                                        @Override
+                                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                            if (response.isSuccessful()) {
+                                                goToLauncherActivity();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                            t.printStackTrace();
+                                        }
+                                    });
+                                } else {
+                                    goToLauncherActivity();
+                                }
+
+
+
                             } else {
                                 Snackbar.make(
                                         findViewById(R.id.rootView),
@@ -258,5 +255,10 @@ public class RegisterActivity extends Activity {
         }
     }
 
+    private void goToLauncherActivity() {
+        Intent intent = new Intent(RegisterActivity.this, LauncherActivity.class);
+        startActivity(intent);
+        finish();
+    }
 
 }

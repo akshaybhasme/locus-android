@@ -110,7 +110,14 @@ public class UserProfileActivity extends AppCompatActivity {
 
     private void setUserProfile(User user) {
         String fullName = user.getFirst_name() + " " + user.getLast_name();
-        Picasso.with(this).load(user.getProfile_pic()).transform(new CircleTransform()).into(ivProfilePic);
+
+        if (!Util.isStringEmpty(user.getProfile_pic()))
+            Picasso
+                    .with(this)
+                    .load(user.getProfile_pic())
+                    .transform(new CircleTransform())
+                    .into(ivProfilePic);
+
         ((TextView) findViewById(R.id.tvUserName)).setText(fullName);
     }
 }

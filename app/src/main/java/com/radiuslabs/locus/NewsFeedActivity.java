@@ -85,7 +85,9 @@ public class NewsFeedActivity extends AppCompatActivity {
         if (Util.user != null)
             name.setText(Util.user.getFullName());
         ImageView ivProfile = (ImageView) header.findViewById(R.id.ivProfilePic);
-        Picasso.with(this).load(Util.user.getProfile_pic()).transform(new CircleTransform()).into(ivProfile);
+        if (!Util.isStringEmpty(Util.user.getProfile_pic())) {
+            Picasso.with(this).load(Util.user.getProfile_pic()).transform(new CircleTransform()).into(ivProfile);
+        }
 
         header.setOnClickListener(new View.OnClickListener() {
             @Override

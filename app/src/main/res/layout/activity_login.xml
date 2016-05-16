@@ -22,7 +22,7 @@
             android:inputType="textEmailAddress"
             android:ems="10"
             android:id="@+id/etEmail"
-            android:hint="Email"/>
+            android:hint="Username" />
 
         <EditText
             android:layout_width="300dp"
